@@ -1,9 +1,6 @@
-const titulo = document.getElementById('titulo')
+const titulo1 = document.getElementById('titulo1')
 const div = document.getElementById('mueblesOpc')
-
-const formularioUsuario = document.getElementById('formulario')
-const nombreUsuario = document.getElementById('nombre')
-const apellidoUsuario = document.getElementById('apellido')
+const mensCompra = document.getElementById('mensajeCompra')
 
 const infoUsuario = {}
 
@@ -44,84 +41,98 @@ let totalCompra = 0
 let decision = 0 
 let totalProductos = 0
 let i = 0 
+let mostrar = 1
 
-do{
-    if (totalProductos === 0 ){
-        //mostrarMuebles()
-
-        for (i=0; i<productosArray.length; i++) {
-            console.log(`${productosArray[i].id}     ${productosArray[i].name}     ${productosArray[i].price}`)
-        }
-        elegir1()
-
-    } else {
-        elegirmas()
-    }
-    
-} while (seguirComprando === true)
+mostrarMuebles() 
+elegirMueble()
 
 
-/*function mostrarMuebles(){
+
+function mostrarMuebles(){
     const parrafoNuevo = document.createElement ('p')
     parrafoNuevo.innerText ='  Por el momento estos son los muebles que ofrecemos:  ' 
     div.append(parrafoNuevo)
 
-    for (let i=0; 1<productosArray.length;i++){
-        const parrafoOpc = document.createElement ('p')
+    for (i=0; i<productosArray.length;i++){
+        let parrafoOpc = document.createElement ('p')
         parrafoOpc.innerText =` ${productosArray[i].id}     ${productosArray[i].name}     ${productosArray[i].price}`
         parrafoOpc.setAttribute('class',`parraOpc${productosArray[i].id}`)
         div.append(parrafoOpc)
     }
-}*/
-
-function elegir1 (){
-    decision = parseInt(prompt("Desea comprar algun mueble ?    1. SI   2. NO"))
-    if (decision === 1 ){
-        seleccionMueble()
-
-    }else if(decision === 2){
-        alert ('Hasta la siguiente')
-        seguirComprando = false
-    }else{
-        console.log ("ERROR ESA OPCION NO EXISTE")
-        elegir1()
-    }
 }
 
-function elegirmas(){
-    decision = parseInt(prompt("Desea comprar otro mueble ?    1. SI   2. NO"))
-    if (decision === 1 ){
-        seleccionMueble()
 
-    }else if(decision === 2){
-        console.log("Estos son los muebles elegidos")
-        for (i=0; i<productosArray.length; i++) {
-            console.log(`${carrito[i].id}     ${carrito[i].name}     ${carrito[i].price}`)
-        }
-        
-        console.log(`el total de su compra es de ${totalCompra}`)
-        seguirComprando = false
-    } else{
-        console.log ("ERROR ESA OPCION NO EXISTE")
-    }
+function elegirMueble(){
+    const listaMueble = document.getElementById('listaMueble')
+    productosArray.forEach(elemento =>{
+        let opcionMueble = document.createElement('option')
+        opcionMueble.innerText =` ${elemento.id} :   ${elemento.name} `
+        opcionMueble.setAttribute('class',`opcionMueble${elemento.id}`)
+        listaMueble.append(opcionMueble)
+    } )
 }
 
-function seleccionMueble(){
-    let opcmueble = parseInt(prompt("Cual es el mueble que desea agregar a su carrito ? " ) )
-    carrito.push(productosArray[opcmueble-1])
-    totalCompra=totalCompra+productosArray[opcmueble-1].price
+const botonAgregar = document.getElementById('botonAgregar')
+botonAgregar.onclick =() => {
+    const indexMueble = listaMueble.selectedIndex
+    //console.log(muebleSeleccionado)
+    carrito.push(productosArray[indexMueble])
+    totalCompra=totalCompra+productosArray[indexMueble].price
     totalProductos=totalProductos+1
+    //console.log(carrito , totalCompra , totalProductos)
 }
 
-formularioUsuario.onsubmit = (form) =>{
-    form.preventDefault()
-    infoUsuario.nombre = nombreUsuario.value
-    infoUsuario.apellido = apellidoUsuario.value
-    localStorage.setItem('infoUsuario',JSON.stringify(infoUsuario))
+
+const botonQuitar = document.getElementById('botonQuitar')
+botonQuitar.onclick = () => {
+    
+    const pError = document.createElement ('p')
+    if (totalProductos === 0){
+        
+        pError.innerText ='  Por el momento no tienes algun mueble seleccionado  ' 
+        mensCompra.append(pError)
+        //console.log(carrito , totalCompra , totalProductos)
+    }else {
+        const indexMueble = listaMueble.selectedIndex
+        const indexCarrito = carrito.indexOf(productosArray[indexMueble])
+        if (indexCarrito === -1){
+           
+            pError.innerText ='  Este mueble, no se encuentra en tu carrito  ' 
+            mensCompra.append(pError) 
+         //   console.log(carrito , totalCompra , totalProductos) 
+        } else {
+            
+            totalCompra=totalCompra-carrito[indexCarrito].price
+            totalProductos=totalProductos-1
+            carrito.splice(indexCarrito,1)
+            
+          //  console.log(carrito , totalCompra , totalProductos)
+
+        }
+    }
 }
 
-const infoUsuarioStorage = JSON.parse(localStorage.getItem('infoUsuario'))
-console.log(infoUsuarioStorage)
-if(infoUsuarioStorage.nombre !== "" || infoUsuarioStorage.apellido !== ""){
-    titulo.innerText = `Hola ${infoUsuarioStorage.nombre} ${infoUsuarioStorage.apellido}, bienvenido de vuelta`
+const botonMostrar = document.getElementById('botonMostrar')
+botonMostrar.onclick = () => {
+    
+
+    carrito.forEach(elemento =>{
+        const pCarrito = document.createElement('p')
+        pCarrito.innerText =` ${elemento.id} :   ${elemento.name}        $ ${elemento.price}`
+        pCarrito.setAttribute('class',`opcionMueble${elemento.id}`)
+        mensCompra.append(pCarrito)
+    } )
+    const pCarritoD1 = document.createElement('p')
+    pCarritoD1.innerText =` ................. `
+    mensCompra.append(pCarritoD1)
+
+    const pTotal = document.getElementById('pTotal')
+    const pCarritoT = document.createElement('p')
+    pCarritoT.innerText =` Cantidad de porductos : ${totalProductos}   TOTAL : $ ${totalCompra} `
+    pTotal.append(pCarritoT)
+    
+    const pCarritoD2 = document.createElement('p')
+    pCarritoD2.innerText =` ................. `
+    pTotal.append(pCarritoD2)
 }
+    
